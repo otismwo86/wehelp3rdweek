@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <meta charset="utf-8"/>
+    <title>Upload File</title>
+</head>
+<body>
+    <h1>發表一篇圖文</h1>
+    <form action="/upload" method="post" enctype="multipart/form-data">
+        <div>留言<input type="text" name="message"></div>
+        <div>圖片<input type="file" name="file"></div>
+        <button type="submit">發表</button>
+    </form>
+    <div id="container"></div>
+    <script>
+        async function fetchdata(){
+            try{
+                fetch('/data')
+                .then(response => response.json())
+                .then(data =>{
+                    let container = document.getElementById('container');
+                    container.innerHTML = '';
+                    // console.log(data.data)
+                    data.data.forEach(item => {
+                        let messagediv = document.createElement('div');
+                        let img = document.createElement('img');
+
+                        messagediv.textContent=item.message;
+                        img.src = item.image_url;
+                        img.alt = "Image";
+                        img.style.width = "200px";
+                        img.style.height = "auto";
+
+                        container.appendChild(messagediv);
+                        container.appendChild(img);
+                        container.appendChild(document.createElement('hr'));
+                    });
+                })
+            } catch (error) {
+                console.error('Error fetching data:', error);
+            }
+        }
+        window.onload = fetchdata;
+    </script>
+</body>
+</html>
