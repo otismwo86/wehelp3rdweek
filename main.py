@@ -4,6 +4,7 @@ import boto3
 from botocore.exceptions import NoCredentialsError
 from fastapi.templating import Jinja2Templates
 import mysql.connector 
+import uuid
 import os
 from dotenv import load_dotenv
 app = FastAPI()
@@ -43,9 +44,9 @@ async def read_root(request: Request):
 @app.post("/upload")
 async def upload_file(file: UploadFile = File(...),message: str = Form(...)):
     try:
-        s3_client.upload_fileobj(file.file, AWS_BUCKET_NAME, file.filename)
-        cloudfront_url = f"https://d2h11xp6qwlofm.cloudfront.net/{file.filename}"
-        file_url = f"https://{AWS_BUCKET_NAME}.s3.amazonaws.com/{file.filename}"
+        unique_filename = f"{uuid.uuid4()}_{file.filename}"
+        s3_client.upload_fileobj(file.file, AWS_BUCKET_NAME, unique_filename)
+        cloudfront_url = f"https://d2h11xp6qwlofm.cloudfront.net/{unique_filename}"
         cursor = connection.cursor()
         query = "INSERT INTO messages (message, image_url) VALUES (%s, %s)"
         cursor.execute(query, (message, cloudfront_url))
